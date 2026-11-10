@@ -114,7 +114,12 @@ workflows:
           LATEST=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" 2>/dev/null || echo 0)
           echo "BUILD_NUMBER=$((LATEST + 1))" >> $CM_ENV
       - name: Create the iPhone project
-        script: npx expo prebuild --platform ios --clean
+        script: |
+          cp package.json /tmp/package.json.keep
+          CI=1 npx expo prebuild --platform ios --clean --no-install
+          cp /tmp/package.json.keep package.json
+      - name: Install iPhone libraries (CocoaPods)
+        script: cd ios && pod install --repo-update
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Build the app
