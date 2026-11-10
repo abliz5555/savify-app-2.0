@@ -101,8 +101,11 @@ workflows:
       xcode: latest
       cocoapods: default
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.savify.mobile
+        # Use exactly these two files from Codemagic → Code signing identities
+        provisioning_profiles:
+          - savify_store
+        certificates:
+          - bounzo_dist
       vars:
         <<: *app_env
         BUNDLE_ID: com.savify.mobile
