@@ -95,7 +95,7 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 90
     integrations:
-      app_store_connect: Savify ASC key   # Team settings → Integrations → App Store Connect
+      app_store_connect: Codemagic   # Team settings → Integrations → Developer Portal (your key "Codemagic")
     environment:
       node: 20
       xcode: latest
