@@ -111,8 +111,10 @@ workflows:
       - *check
       - name: Pick the next build number
         script: |
-          LATEST=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" 2>/dev/null || echo 0)
-          echo "BUILD_NUMBER=$((LATEST + 1))" >> $CM_ENV
+          # Date + time (UTC), e.g. 2611101330. Always higher than any earlier build.
+          NEXT=$(date -u +%y%m%d%H%M)
+          echo "Build number: $NEXT"
+          echo "BUILD_NUMBER=$NEXT" >> $CM_ENV
       - name: Create the iPhone project
         script: |
           cp package.json /tmp/package.json.keep
