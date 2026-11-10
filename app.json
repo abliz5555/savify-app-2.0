@@ -2,7 +2,7 @@
   "expo": {
     "name": "Savify",
     "slug": "savify-mobile",
-    "version": "1.0.0",
+    "version": "1.1",
     "extra": {
       "eas": {
         "projectId": "8104b9d2-34c5-47a7-9df2-322b0649924b"
