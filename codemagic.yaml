@@ -27,8 +27,8 @@ definitions:
 workflows:
 
   # 1 ──────────────────────────────────────────────────────────────────────────
-  android-test:
-    name: Android – test APK
+  savify-android:
+    name: savify-android (Android test APK)
     instance_type: linux_x2
     max_build_duration: 60
     environment:
