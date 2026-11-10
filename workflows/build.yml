@@ -1,0 +1,66 @@
+# Build Savify on Expo's servers (EAS) by pressing a button on GitHub.
+#
+# ONE-TIME SETUP (see GITHUB-AND-BUILD.md):
+#   1. expo.dev → Account settings → Access tokens → Create → copy it
+#   2. GitHub repo → Settings → Secrets and variables → Actions → New secret
+#        Name: EXPO_TOKEN    Value: the token
+#
+# USE: GitHub repo → Actions → "Build Savify" → Run workflow → pick what to build.
+name: Build Savify
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: "What to build"
+        required: true
+        default: "android-apk (test file for Android phones)"
+        type: choice
+        options:
+          - "android-apk (test file for Android phones)"
+          - "android-store (Google Play .aab)"
+          - "ios-store (App Store / TestFlight)"
+          - "both-stores (iPhone + Google Play)"
+      submit:
+        description: "Also send it to the store when finished (store builds only)"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the Expo token is set
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "::error::EXPO_TOKEN secret is missing. See GITHUB-AND-BUILD.md, Part 3."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - run: npm ci
+
+      - name: Start the build on Expo
+        run: |
+          case "${{ inputs.what }}" in
+            android-apk*)   ARGS="--platform android --profile apk" ;;
+            android-store*) ARGS="--platform android --profile production" ;;
+            ios-store*)     ARGS="--platform ios --profile production" ;;
+            both-stores*)   ARGS="--platform all --profile production" ;;
+          esac
+          SUBMIT=""
+          if [ "${{ inputs.submit }}" = "true" ] && [[ "${{ inputs.what }}" != android-apk* ]]; then SUBMIT="--auto-submit"; fi
+          eas build $ARGS $SUBMIT --non-interactive --no-wait
+          echo "✅ Build started. Watch it and download the file at https://expo.dev (your project → Builds)."
