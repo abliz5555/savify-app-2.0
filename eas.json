@@ -1,0 +1,59 @@
+{
+  "cli": {
+    "version": ">= 20.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://cmlewbfricsklzncddnc.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtbGV3YmZyaWNza2x6bmNkZG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODYxMzgsImV4cCI6MjA5NTk2MjEzOH0.L-4XnbxKRlrOMGMZHGskmvFMbKUsOC90BQi_L8N5-n4",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "appl_WpQiCoezfUXVyQLZNgZfWdbYoYI"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://cmlewbfricsklzncddnc.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtbGV3YmZyaWNza2x6bmNkZG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODYxMzgsImV4cCI6MjA5NTk2MjEzOH0.L-4XnbxKRlrOMGMZHGskmvFMbKUsOC90BQi_L8N5-n4",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "appl_WpQiCoezfUXVyQLZNgZfWdbYoYI"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://cmlewbfricsklzncddnc.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtbGV3YmZyaWNza2x6bmNkZG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODYxMzgsImV4cCI6MjA5NTk2MjEzOH0.L-4XnbxKRlrOMGMZHGskmvFMbKUsOC90BQi_L8N5-n4",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "appl_WpQiCoezfUXVyQLZNgZfWdbYoYI"
+      }
+    },
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://cmlewbfricsklzncddnc.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtbGV3YmZyaWNza2x6bmNkZG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODYxMzgsImV4cCI6MjA5NTk2MjEzOH0.L-4XnbxKRlrOMGMZHGskmvFMbKUsOC90BQi_L8N5-n4",
+        "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "appl_WpQiCoezfUXVyQLZNgZfWdbYoYI"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
