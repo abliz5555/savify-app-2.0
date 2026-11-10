@@ -1,0 +1,129 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Savify — Codemagic build settings
+#  Codemagic reads this file automatically from the main folder of your repo.
+#
+#  3 workflows (choose one when you press "Start new build"):
+#    1. Android – test APK       → install on any Android phone. NO setup needed.
+#    2. Android – Google Play    → signed .aab for Google Play (needs keystore "savify_upload")
+#    3. iPhone  – TestFlight     → sent to TestFlight (needs App Store Connect key "Savify ASC key")
+#
+#  Step-by-step setup: GITHUB-AND-BUILD.md
+# ─────────────────────────────────────────────────────────────────────────────
+
+definitions:
+  app_env: &app_env
+    # Public app keys (safe in the app — the database only lets each user see their own data)
+    EXPO_PUBLIC_SUPABASE_URL: https://cmlewbfricsklzncddnc.supabase.co
+    EXPO_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtbGV3YmZyaWNza2x6bmNkZG5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODYxMzgsImV4cCI6MjA5NTk2MjEzOH0.L-4XnbxKRlrOMGMZHGskmvFMbKUsOC90BQi_L8N5-n4
+
+  scripts:
+    - &install
+      name: Install packages
+      script: npm ci
+    - &check
+      name: Check the code for errors
+      script: npx tsc --noEmit
+
+workflows:
+
+  # 1 ──────────────────────────────────────────────────────────────────────────
+  android-test:
+    name: Android – test APK
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      node: 20
+      java: 17
+      vars:
+        <<: *app_env
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.npm
+    scripts:
+      - *install
+      - *check
+      - name: Create the Android project
+        script: npx expo prebuild --platform android --clean --no-install
+      - name: Build the APK
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+
+  # 2 ──────────────────────────────────────────────────────────────────────────
+  android-playstore:
+    name: Android – Google Play (.aab)
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      node: 20
+      java: 17
+      android_signing:
+        - savify_upload          # Team settings → Code signing identities → Android keystores
+      vars:
+        <<: *app_env
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.npm
+    scripts:
+      - *install
+      - *check
+      - name: Create the Android project
+        script: npx expo prebuild --platform android --clean --no-install
+      - name: Use the upload keystore
+        script: node scripts/codemagic-android-signing.js
+      - name: Build the app bundle
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease --no-daemon
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab
+    # After your FIRST manual upload to Google Play you can switch on automatic upload:
+    # publishing:
+    #   google_play:
+    #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+    #     track: internal
+
+  # 3 ──────────────────────────────────────────────────────────────────────────
+  ios-testflight:
+    name: iPhone – TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    integrations:
+      app_store_connect: Savify ASC key   # Team settings → Integrations → App Store Connect
+    environment:
+      node: 20
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.savify.mobile
+      vars:
+        <<: *app_env
+        BUNDLE_ID: com.savify.mobile
+    scripts:
+      - *install
+      - *check
+      - name: Pick the next build number
+        script: |
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" 2>/dev/null || echo 0)
+          echo "BUILD_NUMBER=$((LATEST + 1))" >> $CM_ENV
+      - name: Create the iPhone project
+        script: npx expo prebuild --platform ios --clean
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build the app
+        script: |
+          WS=$(ls -d ios/*.xcworkspace | head -1)
+          xcode-project build-ipa --workspace "$WS" --scheme "$(basename "$WS" .xcworkspace)"
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
